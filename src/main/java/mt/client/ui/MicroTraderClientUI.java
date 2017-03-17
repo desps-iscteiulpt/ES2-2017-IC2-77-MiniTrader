@@ -12,6 +12,10 @@ import mt.client.controller.Controller;
 import mt.client.Session;
 import mt.client.exception.AuthenticationException;
 import mt.client.exception.ConnectionClosedException;
+/**
+ * Just a test commit
+ */
+
 
 /**
  * Main screen of the Micro Trader.
