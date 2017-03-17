@@ -7,6 +7,10 @@ import javax.swing.JOptionPane;
 import mt.client.controller.Controller;
 
 /**
+ * Just a test commit
+ */
+
+/**
  * Called by {@link MicroTraderClientUI} to send the user information in order
  * to connect to a Micro Trader Server.
  */
