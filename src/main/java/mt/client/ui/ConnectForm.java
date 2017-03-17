@@ -7,7 +7,7 @@ import javax.swing.JOptionPane;
 import mt.client.controller.Controller;
 
 /**
- * Just a test commit
+ * Just a Test commit
  */
 
 /**
