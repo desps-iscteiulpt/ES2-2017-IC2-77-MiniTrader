@@ -113,14 +113,14 @@ public class MicroServer implements MicroTraderServer {
 			case NEW_ORDER:
 				try {
 					verifyUserConnected(msg);
-						if (msg.getOrder().getNumberOfUnits() >= 10) {
-							if (msg.getOrder().getServerOrderID() == EMPTY) {
-								msg.getOrder().setServerOrderID(id++);
-							}
-							notifyAllClients(msg.getOrder());
-							processNewOrder(msg);
+					if (msg.getOrder().getNumberOfUnits() >= 10) {
+						if (msg.getOrder().getServerOrderID() == EMPTY) {
+							msg.getOrder().setServerOrderID(id++);
 						}
-					
+						notifyAllClients(msg.getOrder());
+						processNewOrder(msg);
+					}
+
 				} catch (ServerException e) {
 					serverComm.sendError(msg.getSenderNickname(), e.getMessage());
 				}
@@ -416,16 +416,15 @@ public class MicroServer implements MicroTraderServer {
 			e.setAttribute("UNITS", "" + order.getNumberOfUnits());
 			e.setAttribute("PRICE", "" + order.getPricePerUnit());
 
+			// Create new element Customer
+			Element customer = doc.createElement("Customer");
+			customer.setTextContent(order.getNickname()); 
+			e.appendChild(customer);
+	
 			// Add new node to XML document root element
 			Node node = doc.getDocumentElement();
 			node.appendChild(e);
 
-			// Create new element Customer
-	         Element customer = doc.createElement("Customer");
-
-	         customer.setTextContent(order.getNickname()); 
-	         e.appendChild(customer);
-			
 			// Save XML document
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
