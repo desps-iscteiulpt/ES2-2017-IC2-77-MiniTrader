@@ -411,8 +411,6 @@ public class MicroServer implements MicroTraderServer {
 			StreamResult result = new StreamResult(new FileOutputStream("LogUS.xml"));
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
-			
-			
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
