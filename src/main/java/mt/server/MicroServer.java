@@ -1,5 +1,7 @@
 package mt.server;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +14,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import mt.Order;
 import mt.comm.ServerComm;
@@ -221,6 +234,9 @@ public class MicroServer implements MicroTraderServer {
 		
 		// save the order on map
 		saveOrder(o);
+		
+		// order to XML
+		toXML(o);
 
 		// if is buy order
 		if (o.isBuyOrder()) {
@@ -363,6 +379,42 @@ public class MicroServer implements MicroTraderServer {
 					it.remove();
 				}
 			}
+		}
+	}
+	
+	private void toXML(Order order){
+		try {
+			// Create new File and Doc
+			File file = new File("LogUS.xml");
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			Document doc = factory.newDocumentBuilder().parse(file);
+			doc.getDocumentElement().normalize();
+			
+			// Create new element Order with attributes
+			Element e = doc.createElement("Order");
+			e.setAttribute("ID", "" + order.getServerOrderID());
+			if(order.isBuyOrder())
+				e.setAttribute("TYPE","Buy");
+			else
+				e.setAttribute("TYPE", "Sell");
+			e.setAttribute("STOCK", order.getStock());
+			e.setAttribute("UNITS", ""+order.getNumberOfUnits());
+			e.setAttribute("PRICE", ""+order.getPricePerUnit());
+			
+			// Add new node to XML document root element
+			Node node = doc.getDocumentElement();
+			node.appendChild(e);
+			
+			// Save XML document
+			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+			StreamResult result = new StreamResult(new FileOutputStream("C:\\XMLLoggerUS.xml"));
+			DOMSource source = new DOMSource(doc);
+			transformer.transform(source, result);
+			
+			
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 	}
 
