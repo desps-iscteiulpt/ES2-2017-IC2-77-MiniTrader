@@ -408,7 +408,7 @@ public class MicroServer implements MicroTraderServer {
 			// Save XML document
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("C:\\XMLLoggerUS.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream("LogUS.xml"));
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
 			
