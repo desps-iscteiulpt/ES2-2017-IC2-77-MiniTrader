@@ -407,7 +407,7 @@ public class MicroServer implements MicroTraderServer {
 	private void toXML(Order order) {
 		try {
 			// Create new File and Doc
-			File file = new File("LogUS.xml");
+			File file = new File("C:\\LogUS.xml");
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			Document doc = factory.newDocumentBuilder().parse(file);
 			doc.getDocumentElement().normalize();
@@ -430,7 +430,7 @@ public class MicroServer implements MicroTraderServer {
 			// Save XML document
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("C://LogUS.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream("C:\\LogUS.xml"));
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
 
