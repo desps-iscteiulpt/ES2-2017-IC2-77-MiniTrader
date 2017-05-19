@@ -397,6 +397,12 @@ public class MicroServer implements MicroTraderServer {
 		}
 	}
 
+	/**
+	 * Recive an order and record the transaction in XML with the sellers/buyers identification
+	 * 
+	 * @param Order
+	 */
+	
 	private void toXML(Order order) {
 		try {
 			// Create new File and Doc
