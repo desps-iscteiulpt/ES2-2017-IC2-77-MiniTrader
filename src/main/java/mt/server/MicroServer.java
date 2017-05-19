@@ -242,9 +242,6 @@ public class MicroServer implements MicroTraderServer {
 		// save the order on map
 		saveOrder(o);
 
-		// order to XML
-		toXML(o);
-
 		// if is buy order
 		if (o.isBuyOrder()) {
 			processBuy(msg.getOrder());
@@ -334,7 +331,7 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private void doTransaction(Order buyOrder, Order sellerOrder) {
 		LOGGER.log(Level.INFO, "Processing transaction between seller and buyer...");
-
+		if(verifyOrder(buyOrder, sellerOrder)){
 		if (buyOrder.getNumberOfUnits() >= sellerOrder.getNumberOfUnits()) {
 			buyOrder.setNumberOfUnits(buyOrder.getNumberOfUnits() - sellerOrder.getNumberOfUnits());
 			sellerOrder.setNumberOfUnits(EMPTY);
@@ -345,6 +342,7 @@ public class MicroServer implements MicroTraderServer {
 
 		updatedOrders.add(buyOrder);
 		updatedOrders.add(sellerOrder);
+		}
 	}
 
 	/**
@@ -402,47 +400,6 @@ public class MicroServer implements MicroTraderServer {
 
 	
 	/**
-	 * Create a xml file
-	 * 
-	 * @param Order receives a buy or sell order
-	 */
-	private void toXML(Order order) {
-		try {
-			// Create new File and Doc
-			File file = new File("LogUS.xml");
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			Document doc = factory.newDocumentBuilder().parse(file);
-			doc.getDocumentElement().normalize();
-
-			// Create new element Order with attributes
-			Element e = doc.createElement("Order");
-			e.setAttribute("ID", "" + order.getServerOrderID());
-			if (order.isBuyOrder())
-				e.setAttribute("TYPE", "Buy");
-			else
-				e.setAttribute("TYPE", "Sell");
-			e.setAttribute("STOCK", order.getStock());
-			e.setAttribute("UNITS", "" + order.getNumberOfUnits());
-			e.setAttribute("PRICE", "" + order.getPricePerUnit());
-
-			// Add new node to XML document root element
-			Node node = doc.getDocumentElement();
-			node.appendChild(e);
-
-			// Save XML document
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("LogUS.xml"));
-			DOMSource source = new DOMSource(doc);
-			transformer.transform(source, result);
-
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
-
-	
-	/**
 	 * Check if the client has more than five orders unfulfilled
 	 * 
 	 * @param String name of the client
@@ -456,6 +413,14 @@ public class MicroServer implements MicroTraderServer {
 		}
 		if (isSellOrder >= 5)
 			return false;
+		else
+			return true;
+	}
+	
+	private boolean verifyOrder(Order order, Order order1) {
+		if(order.getNickname().equals(order1.getNickname())){
+			return false;
+		}
 		else
 			return true;
 	}
