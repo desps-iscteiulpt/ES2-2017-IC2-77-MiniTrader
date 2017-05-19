@@ -398,6 +398,12 @@ public class MicroServer implements MicroTraderServer {
 		}
 	}
 
+	
+	/**
+	 * Create a xml file
+	 * 
+	 * @param Order receives a buy or sell order
+	 */
 	private void toXML(Order order) {
 		try {
 			// Create new File and Doc
@@ -424,7 +430,7 @@ public class MicroServer implements MicroTraderServer {
 			// Save XML document
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("C:\\XMLLoggerUS.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream("LogUS.xml"));
 			DOMSource source = new DOMSource(doc);
 			transformer.transform(source, result);
 
@@ -433,6 +439,13 @@ public class MicroServer implements MicroTraderServer {
 		}
 	}
 
+	
+	/**
+	 * Check if the client has more than five orders unfulfilled
+	 * 
+	 * @param String name of the client
+	 */
+	
 	private boolean checkOrder(String nome) {
 		int isSellOrder = 0;
 		for (Order order : orderMap.get(nome)) {
