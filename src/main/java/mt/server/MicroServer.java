@@ -1,7 +1,6 @@
 package mt.server;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -15,16 +14,18 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import mt.Order;
 import mt.comm.ServerComm;
@@ -405,15 +406,19 @@ public class MicroServer implements MicroTraderServer {
 	 * @param Order receives a buy or sell order
 	 */
 	private void toXML(Order order) {
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder docBuilder = null;
 		try {
-			// Create new File and Doc
-			File file = new File("C:\\LogUS.xml");
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-			Document doc = factory.newDocumentBuilder().parse(file);
-			doc.getDocumentElement().normalize();
+			docBuilder = docFactory.newDocumentBuilder();
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-			// Create new element Order with attributes
-			Element e = doc.createElement("Order");
+		// root elements
+		Document doc = docBuilder.newDocument();
+
+		Element e = doc.createElement("Order");
 			e.setAttribute("ID", "" + order.getServerOrderID());
 			if (order.isBuyOrder())
 				e.setAttribute("TYPE", "Buy");
@@ -422,21 +427,30 @@ public class MicroServer implements MicroTraderServer {
 			e.setAttribute("STOCK", order.getStock());
 			e.setAttribute("UNITS", "" + order.getNumberOfUnits());
 			e.setAttribute("PRICE", "" + order.getPricePerUnit());
+		doc.appendChild(e);
+		
 
-			// Add new node to XML document root element
-			Node node = doc.getDocumentElement();
-			node.appendChild(e);
-
-			// Save XML document
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
-			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-			StreamResult result = new StreamResult(new FileOutputStream("C:\\LogUS.xml"));
-			DOMSource source = new DOMSource(doc);
-			transformer.transform(source, result);
-
-		} catch (Exception e) {
-			// TODO: handle exception
+		// write the content into xml file
+		TransformerFactory transformerFactory = TransformerFactory.newInstance();
+		Transformer transformer = null;
+		try {
+			transformer = transformerFactory.newTransformer();
+		} catch (TransformerConfigurationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
 		}
+		DOMSource source = new DOMSource(doc);
+
+			try {
+				// Output to console for testing
+				//StreamResult result = new StreamResult(System.out);
+				//transformer.transform(source, result);
+				StreamResult result = new StreamResult(new File("LogUs.xml"));
+				transformer.transform(source, result);
+			} catch (TransformerException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 	}
 
 	
