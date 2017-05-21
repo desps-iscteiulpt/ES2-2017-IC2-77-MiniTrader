@@ -1,6 +1,7 @@
 package mt.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +27,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import mt.Order;
 import mt.comm.ServerComm;
@@ -408,6 +411,9 @@ public class MicroServer implements MicroTraderServer {
 	private void toXML(Order order) {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = null;
+		Document doc=null;
+		File f = new File("LogUS.xml");
+		boolean firstRun = false;
 		try {
 			docBuilder = docFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
@@ -416,19 +422,39 @@ public class MicroServer implements MicroTraderServer {
 		}
 
 		// root elements
-		Document doc = docBuilder.newDocument();
-
-		Element e = doc.createElement("Order");
-			e.setAttribute("ID", "" + order.getServerOrderID());
-			if (order.isBuyOrder())
-				e.setAttribute("TYPE", "Buy");
-			else
-				e.setAttribute("TYPE", "Sell");
-			e.setAttribute("STOCK", order.getStock());
-			e.setAttribute("UNITS", "" + order.getNumberOfUnits());
-			e.setAttribute("PRICE", "" + order.getPricePerUnit());
-		doc.appendChild(e);
+		if(!f.exists()){
+		doc = docBuilder.newDocument();
+		firstRun=true;
+		}
+		else{
+			try {
+				doc = docBuilder.parse(f);
+				doc.getDocumentElement().normalize();
+			} catch (SAXException | IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+		}
 		
+
+		//INICIO
+		Element e =doc.createElement("Order");
+		e.setAttribute("ID", "" + order.getServerOrderID());
+		if (order.isBuyOrder())
+			e.setAttribute("TYPE", "Buy");
+		else
+			e.setAttribute("TYPE", "Sell");
+		e.setAttribute("STOCK", order.getStock());
+		e.setAttribute("UNITS", "" + order.getNumberOfUnits());
+		e.setAttribute("PRICE", "" + order.getPricePerUnit());
+		
+		if(firstRun==false){
+			Node node = doc.getDocumentElement();
+			node.appendChild(e);
+			}
+			else{
+				doc.appendChild(e);
+			}
 
 		// write the content into xml file
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -443,14 +469,15 @@ public class MicroServer implements MicroTraderServer {
 
 			try {
 				// Output to console for testing
-				//StreamResult result = new StreamResult(System.out);
-				//transformer.transform(source, result);
-				StreamResult result = new StreamResult(new File("LogUs.xml"));
+				StreamResult result = new StreamResult(System.out);
+				transformer.transform(source, result);
+				result = new StreamResult(f);
 				transformer.transform(source, result);
 			} catch (TransformerException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+		
 	}
 
 	
