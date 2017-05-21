@@ -413,6 +413,7 @@ public class MicroServer implements MicroTraderServer {
 		DocumentBuilder docBuilder = null;
 		Document doc=null;
 		File f = new File("LogAs.xml");
+		boolean firstRun = false;
 		try {
 			docBuilder = docFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
@@ -421,8 +422,10 @@ public class MicroServer implements MicroTraderServer {
 		}
 
 		// root elements
-		if(!f.exists())
+		if(!f.exists()){
 		doc = docBuilder.newDocument();
+		firstRun=true;
+		}
 		else{
 			try {
 				doc = docBuilder.parse(f);
@@ -444,15 +447,20 @@ public class MicroServer implements MicroTraderServer {
 		e.setAttribute("STOCK", order.getStock());
 		e.setAttribute("UNITS", "" + order.getNumberOfUnits());
 		e.setAttribute("PRICE", "" + order.getPricePerUnit());
-		
-		Node node = doc.getDocumentElement();
-		node.appendChild(e);
 
 		// Create new element Customer
 		Element customer = doc.createElement("Customer");
 		customer.setTextContent(order.getNickname()); 
 		e.appendChild(customer);
 		//FIMMMMMMMMM
+		
+		if(firstRun==false){
+			Node node = doc.getDocumentElement();
+			node.appendChild(e);
+			}
+			else{
+				doc.appendChild(e);
+			}
 		
 		// shorten way
 		// staff.setAttribute("id", "1");
