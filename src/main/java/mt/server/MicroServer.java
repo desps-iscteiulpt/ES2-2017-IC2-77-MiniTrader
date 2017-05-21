@@ -1,6 +1,7 @@
 package mt.server;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,6 +28,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import mt.Order;
 import mt.comm.ServerComm;
@@ -408,6 +411,8 @@ public class MicroServer implements MicroTraderServer {
 	private void toXML(Order order) {
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = null;
+		Document doc=null;
+		File f = new File("LogAs.xml");
 		try {
 			docBuilder = docFactory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
@@ -416,7 +421,18 @@ public class MicroServer implements MicroTraderServer {
 		}
 
 		// root elements
-		Document doc = docBuilder.newDocument();
+		if(!f.exists())
+		doc = docBuilder.newDocument();
+		else{
+			try {
+				doc = docBuilder.parse(f);
+				doc.getDocumentElement().normalize();
+			} catch (SAXException | IOException e2) {
+				// TODO Auto-generated catch block
+				e2.printStackTrace();
+			}
+		}
+		
 
 		//INICIO
 		Element e =doc.createElement("Order");
@@ -428,7 +444,9 @@ public class MicroServer implements MicroTraderServer {
 		e.setAttribute("STOCK", order.getStock());
 		e.setAttribute("UNITS", "" + order.getNumberOfUnits());
 		e.setAttribute("PRICE", "" + order.getPricePerUnit());
-		doc.appendChild(e);
+		
+		Node node = doc.getDocumentElement();
+		node.appendChild(e);
 
 		// Create new element Customer
 		Element customer = doc.createElement("Customer");
@@ -454,7 +472,7 @@ public class MicroServer implements MicroTraderServer {
 				// Output to console for testing
 				StreamResult result = new StreamResult(System.out);
 				transformer.transform(source, result);
-				result = new StreamResult(new File("LogAs.xml"));
+				result = new StreamResult(f);
 				transformer.transform(source, result);
 			} catch (TransformerException e1) {
 				// TODO Auto-generated catch block
