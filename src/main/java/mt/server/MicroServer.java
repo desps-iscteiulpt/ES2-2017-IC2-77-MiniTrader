@@ -36,7 +36,6 @@ import mt.comm.ServerComm;
 import mt.comm.ServerSideMessage;
 import mt.comm.impl.ServerCommImpl;
 import mt.exception.ServerException;
-import mt.filter.AnalyticsFilter;
 
 /**
  * MicroTraderServer implementation. This class should be responsible to do the
@@ -48,7 +47,7 @@ import mt.filter.AnalyticsFilter;
 public class MicroServer implements MicroTraderServer {
 
 	public static void main(String[] args) {
-		ServerComm serverComm = new AnalyticsFilter(new ServerCommImpl());
+		ServerComm serverComm = new ServerCommImpl();
 		MicroTraderServer server = new MicroServer();
 		server.start(serverComm);
 	}
@@ -100,7 +99,7 @@ public class MicroServer implements MicroTraderServer {
 			ServerSideMessage.Type type = msg.getType();
 
 			if (type == null) {
-				serverComm.sendError(null, "Type was not recognized");
+				//serverComm.sendError(null, "Type was not recognized");
 				continue;
 			}
 
@@ -109,7 +108,7 @@ public class MicroServer implements MicroTraderServer {
 				try {
 					processUserConnected(msg);
 				} catch (ServerException e) {
-					serverComm.sendError(msg.getSenderNickname(), e.getMessage());
+					//serverComm.sendError(msg.getSenderNickname(), e.getMessage());
 				}
 				break;
 			case DISCONNECTED:
@@ -127,7 +126,7 @@ public class MicroServer implements MicroTraderServer {
 					}
 
 				} catch (ServerException e) {
-					serverComm.sendError(msg.getSenderNickname(), e.getMessage());
+					//serverComm.sendError(msg.getSenderNickname(), e.getMessage());
 				}
 
 				break;
